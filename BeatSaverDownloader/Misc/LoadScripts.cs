@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using IPA.Utilities;
 
 namespace BeatSaverDownloader.Misc
 {
@@ -35,7 +36,7 @@ namespace BeatSaverDownloader.Misc
             using (var www = new WWW(audioPath))
             {
                 yield return www;
-                ReflectionUtil.SetPrivateField(obj, fieldName, www.GetAudioClip(true, true, AudioType.UNKNOWN));
+                ReflectionUtil.SetField(obj, fieldName, www.GetAudioClip(true, true, AudioType.UNKNOWN));
             }
         }
     }

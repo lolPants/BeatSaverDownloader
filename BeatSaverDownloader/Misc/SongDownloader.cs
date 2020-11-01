@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -61,7 +61,10 @@ namespace BeatSaverDownloader.Misc
                 {
                     Directory.CreateDirectory(customSongsPath);
                 }
-                var zip = await song.DownloadZip(direct, token, progress).ConfigureAwait(false); 
+
+                var options = new BeatSaverSharp.StandardRequestOptions { Token = token, Progress = progress };
+                var zip = await song.ZipBytes(direct, options).ConfigureAwait(false); 
+
                 Plugin.log.Info("Downloaded zip!");
                 await ExtractZipAsync(song, zip, customSongsPath).ConfigureAwait(false);
                 songDownloaded?.Invoke(song);

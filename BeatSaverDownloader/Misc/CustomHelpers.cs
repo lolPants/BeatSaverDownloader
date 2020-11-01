@@ -1,4 +1,4 @@
-﻿using HMUI;
+using HMUI;
 using SongCore.OverrideClasses;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ namespace BeatSaverDownloader.Misc
     {
         public static void RefreshTable(this TableView tableView, bool callbackTable = true)
         {
-            HashSet<int> rows = new HashSet<int>(tableView.GetPrivateField<HashSet<int>>("_selectedCellIdxs"));
+            HashSet<int> rows = IPA.Utilities.ReflectionUtil.GetField<HashSet<int>, TableView>(tableView, "_selectedCellIdxs");
 
             tableView.ReloadData();
             if (rows.Count > 0)

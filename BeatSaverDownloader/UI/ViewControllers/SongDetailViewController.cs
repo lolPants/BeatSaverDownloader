@@ -1,4 +1,4 @@
-﻿using BeatSaberMarkupLanguage.Attributes;
+using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Notify;
 using HMUI;
 using System;
@@ -8,6 +8,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using IPA.Utilities;
 
 namespace BeatSaverDownloader.UI.ViewControllers
 {
@@ -221,11 +222,14 @@ namespace BeatSaverDownloader.UI.ViewControllers
         internal void SetupDifficultyDisplay()
         {
             var diffs = new List<BeatSaverSharp.BeatmapCharacteristicDifficulty>();
-            List<string> diffNames = new List<string>(_selectedCharacteristic.Difficulties.Keys.Where(x => _selectedCharacteristic.Difficulties[x].HasValue)).OrderBy(x => DiffOrder(x)).ToList();
+            List<string> diffNames = new List<string>(_selectedCharacteristic.Difficulties.Keys.Where(x => _selectedCharacteristic.Difficulties.ContainsKey(x))).OrderBy(x => DiffOrder(x)).ToList();
             foreach (var diff in diffNames)
             {
-                if (_selectedCharacteristic.Difficulties[diff].HasValue)
-                    diffs.Add(_selectedCharacteristic.Difficulties[diff].Value);
+                if (_selectedCharacteristic.Difficulties.ContainsKey(diff))
+                {
+                    var x = _selectedCharacteristic.Difficulties[diff];
+                    if (x != null) diffs.Add(x);
+                }
             }
 
             for (int i = 0; i < diffNames.Count; ++i)
@@ -307,12 +311,14 @@ namespace BeatSaverDownloader.UI.ViewControllers
 
             TextSegmentedControlCell[] _segments = Resources.FindObjectsOfTypeAll<TextSegmentedControlCell>();
 
-            segmentedControl.SetPrivateField("_singleCellPrefab", _segments.First(x => x.name == "SingleHorizontalTextSegmentedControlCell"));
-            segmentedControl.SetPrivateField("_firstCellPrefab", _segments.First(x => x.name == "LeftHorizontalTextSegmentedControlCell"));
-            segmentedControl.SetPrivateField("_middleCellPrefab", _segments.Last(x => x.name == "MiddleHorizontalTextSegmentedControlCell"));
-            segmentedControl.SetPrivateField("_lastCellPrefab", _segments.Last(x => x.name == "RightHorizontalTextSegmentedControlCell"));
+            ReflectionUtil.SetField(segmentedControl, "_singleCellPrefab", _segments.First(x => x.name == "SingleHorizontalTextSegmentedControlCell"));
+            ReflectionUtil.SetField(segmentedControl, "_firstCellPrefab", _segments.First(x => x.name == "LeftHorizontalTextSegmentedControlCell"));
+            ReflectionUtil.SetField(segmentedControl, "_middleCellPrefab", _segments.Last(x => x.name == "MiddleHorizontalTextSegmentedControlCell"));
+            ReflectionUtil.SetField(segmentedControl, "_lastCellPrefab", _segments.Last(x => x.name == "RightHorizontalTextSegmentedControlCell"));
 
-            segmentedControl.SetPrivateField("_container", Resources.FindObjectsOfTypeAll<TextSegmentedControl>().Select(x => x.GetPrivateField<object>("_container")).First(x => x != null));
+            ReflectionUtil.SetField(segmentedControl, "_container", Resources.FindObjectsOfTypeAll<TextSegmentedControl>()
+                .Select(x => ReflectionUtil.GetField<Zenject.DiContainer, TextSegmentedControl>(x, "_container"))
+                .First(x => x != null));
 
             segmentedControl.transform.SetParent(parent, false);
             (segmentedControl.transform as RectTransform).anchorMax = new Vector2(0.5f, 0.5f);
@@ -320,8 +326,8 @@ namespace BeatSaverDownloader.UI.ViewControllers
             (segmentedControl.transform as RectTransform).anchoredPosition = anchoredPosition;
             (segmentedControl.transform as RectTransform).sizeDelta = sizeDelta;
 
-            segmentedControl.SetPrivateField("_fontSize", fontSize);
-            segmentedControl.SetPrivateField("_padding", padding);
+            ReflectionUtil.SetField(segmentedControl, "_fontSize", fontSize);
+            ReflectionUtil.SetField(segmentedControl, "_padding", padding);
             if (onValueChanged != null)
                 segmentedControl.didSelectCellEvent += (sender, index) => { onValueChanged(index); };
 
@@ -335,12 +341,14 @@ namespace BeatSaverDownloader.UI.ViewControllers
 
             IconSegmentedControlCell[] _segments = Resources.FindObjectsOfTypeAll<IconSegmentedControlCell>();
 
-            segmentedControl.SetPrivateField("_singleCellPrefab", _segments.First(x => x.name == "SingleHorizontalIconSegmentedControlCell"));
-            segmentedControl.SetPrivateField("_firstCellPrefab", _segments.First(x => x.name == "LeftHorizontalIconSegmentedControlCell"));
-            segmentedControl.SetPrivateField("_middleCellPrefab", _segments.First(x => x.name == "MiddleHorizontalIconSegmentedControlCell"));
-            segmentedControl.SetPrivateField("_lastCellPrefab", _segments.First(x => x.name == "RightHorizontalIconSegmentedControlCell"));
+            ReflectionUtil.SetField(segmentedControl, "_singleCellPrefab", _segments.First(x => x.name == "SingleHorizontalIconSegmentedControlCell"));
+            ReflectionUtil.SetField(segmentedControl, "_firstCellPrefab", _segments.First(x => x.name == "LeftHorizontalIconSegmentedControlCell"));
+            ReflectionUtil.SetField(segmentedControl, "_middleCellPrefab", _segments.First(x => x.name == "MiddleHorizontalIconSegmentedControlCell"));
+            ReflectionUtil.SetField(segmentedControl, "_lastCellPrefab", _segments.First(x => x.name == "RightHorizontalIconSegmentedControlCell"));
 
-            segmentedControl.SetPrivateField("_container", Resources.FindObjectsOfTypeAll<IconSegmentedControl>().Select(x => x.GetPrivateField<object>("_container")).First(x => x != null));
+            ReflectionUtil.SetField(segmentedControl, "_container", Resources.FindObjectsOfTypeAll<IconSegmentedControl>()
+                .Select(x => ReflectionUtil.GetField<Zenject.DiContainer, IconSegmentedControl>(x, "_container"))
+                .First(x => x != null));
 
             segmentedControl.transform.SetParent(parent, false);
             (segmentedControl.transform as RectTransform).anchorMax = new Vector2(0.5f, 0.5f);

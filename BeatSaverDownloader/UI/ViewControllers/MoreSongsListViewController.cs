@@ -428,7 +428,7 @@ namespace BeatSaverDownloader.UI.ViewControllers
             for (uint i = 0; i < count; ++i)
             {
                 _fetchingDetails = $"({i + 1}/{count})";
-                BeatSaverSharp.Page page = null;
+                BeatSaverSharp.Page<PagedRequestOptions> page = null;
 
                 var options = new PagedRequestOptions
                 {
@@ -511,7 +511,7 @@ namespace BeatSaverDownloader.UI.ViewControllers
                     Token = cancellationTokenSource.Token,
                     Progress = fetchProgress,
                 };
-                BeatSaverSharp.Page page = await Plugin.BeatSaver.Search(options);
+                BeatSaverSharp.Page<SearchRequestOptions> page = await Plugin.BeatSaver.Search(options);
 
                 lastPage++;
                 if (page.TotalDocs == 0 || page.NextPage == null)
